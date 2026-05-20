@@ -1,6 +1,8 @@
 // === Insurance Weather Services - Main Application ===
 
 let activeTab = 'address';
+let autocompleteTimer = null;
+let autocompleteController = null;
 
 // === Visit Counter ===
 function initVisitCounter() {
@@ -62,6 +64,98 @@ async function geocodeLocation(query) {
         displayName: data[0].display_name,
         address: data[0].address
     };
+}
+
+// === Address Autocomplete ===
+async function fetchAutocompleteSuggestions(query) {
+    if (autocompleteController) autocompleteController.abort();
+    autocompleteController = new AbortController();
+
+    const url = `https://nominatim.openstreetmap.org/search?format=json&q=${encodeURIComponent(query)}&countrycodes=us&limit=5&addressdetails=1`;
+    const response = await fetch(url, {
+        headers: { 'User-Agent': 'InsuranceWeatherServices/1.0' },
+        signal: autocompleteController.signal
+    });
+    return await response.json();
+}
+
+function setupAutocomplete() {
+    const input = document.getElementById('addressInput');
+    const dropdown = document.getElementById('autocompleteDropdown');
+    let selectedIndex = -1;
+
+    input.addEventListener('input', () => {
+        const query = input.value.trim();
+        clearTimeout(autocompleteTimer);
+        selectedIndex = -1;
+
+        if (query.length < 3) {
+            dropdown.classList.remove('active');
+            dropdown.innerHTML = '';
+            return;
+        }
+
+        dropdown.innerHTML = '<div class="autocomplete-loading"><i class="fas fa-spinner fa-spin"></i> Searching...</div>';
+        dropdown.classList.add('active');
+
+        autocompleteTimer = setTimeout(async () => {
+            try {
+                const results = await fetchAutocompleteSuggestions(query);
+                if (results.length === 0) {
+                    dropdown.innerHTML = '<div class="autocomplete-loading">No results found</div>';
+                    return;
+                }
+                dropdown.innerHTML = results.map((r, i) => `
+                    <div class="autocomplete-item" data-index="${i}" data-display="${r.display_name}">
+                        <i class="fas fa-map-marker-alt"></i>
+                        <span>${r.display_name}</span>
+                    </div>
+                `).join('');
+
+                dropdown.querySelectorAll('.autocomplete-item').forEach(item => {
+                    item.addEventListener('click', () => {
+                        input.value = item.dataset.display;
+                        dropdown.classList.remove('active');
+                        dropdown.innerHTML = '';
+                    });
+                });
+            } catch (err) {
+                if (err.name !== 'AbortError') {
+                    dropdown.innerHTML = '<div class="autocomplete-loading">Error fetching suggestions</div>';
+                }
+            }
+        }, 350);
+    });
+
+    input.addEventListener('keydown', (e) => {
+        const items = dropdown.querySelectorAll('.autocomplete-item');
+        if (!items.length) return;
+
+        if (e.key === 'ArrowDown') {
+            e.preventDefault();
+            selectedIndex = Math.min(selectedIndex + 1, items.length - 1);
+            items.forEach((el, i) => el.classList.toggle('active', i === selectedIndex));
+        } else if (e.key === 'ArrowUp') {
+            e.preventDefault();
+            selectedIndex = Math.max(selectedIndex - 1, 0);
+            items.forEach((el, i) => el.classList.toggle('active', i === selectedIndex));
+        } else if (e.key === 'Enter' && selectedIndex >= 0) {
+            e.preventDefault();
+            input.value = items[selectedIndex].dataset.display;
+            dropdown.classList.remove('active');
+            dropdown.innerHTML = '';
+        } else if (e.key === 'Escape') {
+            dropdown.classList.remove('active');
+            dropdown.innerHTML = '';
+        }
+    });
+
+    document.addEventListener('click', (e) => {
+        if (!e.target.closest('.autocomplete-wrapper')) {
+            dropdown.classList.remove('active');
+            dropdown.innerHTML = '';
+        }
+    });
 }
 
 // === Build Search Query ===
@@ -304,6 +398,70 @@ function renderHourlyChart(hourly) {
     });
 }
 
+// === Historical Comparison ===
+function getLastYearDate(dateStr) {
+    const d = new Date(dateStr + 'T00:00:00');
+    d.setFullYear(d.getFullYear() - 1);
+    const yyyy = d.getFullYear();
+    const mm = String(d.getMonth() + 1).padStart(2, '0');
+    const dd = String(d.getDate()).padStart(2, '0');
+    return `${yyyy}-${mm}-${dd}`;
+}
+
+function displayHistoricalComparison(currentData, lastYearData, currentDate, lastYearDate) {
+    const section = document.getElementById('historicalSection');
+
+    if (!lastYearData || !lastYearData.daily) {
+        section.style.display = 'none';
+        return;
+    }
+
+    const curDaily = currentData.daily;
+    const prevDaily = lastYearData.daily;
+
+    const curWind = curDaily.windspeed_10m_max?.[0] ?? 0;
+    const prevWind = prevDaily.windspeed_10m_max?.[0] ?? 0;
+    const curPrecip = curDaily.precipitation_sum?.[0] ?? 0;
+    const prevPrecip = prevDaily.precipitation_sum?.[0] ?? 0;
+    const curTemp = curDaily.temperature_2m_max?.[0] ?? 0;
+    const prevTemp = prevDaily.temperature_2m_max?.[0] ?? 0;
+
+    document.getElementById('currentWind').textContent = curWind.toFixed(1);
+    document.getElementById('prevWind').textContent = prevWind.toFixed(1);
+    document.getElementById('currentPrecip').textContent = curPrecip.toFixed(2);
+    document.getElementById('prevPrecip').textContent = prevPrecip.toFixed(2);
+    document.getElementById('currentTemp').textContent = Math.round(curTemp);
+    document.getElementById('prevTemp').textContent = Math.round(prevTemp);
+
+    const lastYearFormatted = new Date(lastYearDate + 'T00:00:00').toLocaleDateString('en-US', {
+        month: 'short', day: 'numeric', year: 'numeric'
+    });
+    document.getElementById('historicalDateLabel').textContent = `(vs. ${lastYearFormatted})`;
+
+    setChangeIndicator('windChange', curWind, prevWind, 'mph');
+    setChangeIndicator('precipChange', curPrecip, prevPrecip, 'in');
+    setChangeIndicator('tempChange', curTemp, prevTemp, '°F');
+
+    section.style.display = 'block';
+}
+
+function setChangeIndicator(elementId, current, previous, unit) {
+    const el = document.getElementById(elementId);
+    const diff = current - previous;
+    const absDiff = Math.abs(diff);
+
+    if (absDiff < 0.1) {
+        el.className = 'comparison-change same';
+        el.innerHTML = '<i class="fas fa-equals"></i> Similar to last year';
+    } else if (diff > 0) {
+        el.className = 'comparison-change increase';
+        el.innerHTML = `<i class="fas fa-arrow-up"></i> +${absDiff.toFixed(1)} ${unit} vs last year`;
+    } else {
+        el.className = 'comparison-change decrease';
+        el.innerHTML = `<i class="fas fa-arrow-down"></i> -${absDiff.toFixed(1)} ${unit} vs last year`;
+    }
+}
+
 // === Map ===
 function updateMap(lat, lon, name, windSpeed, precip) {
     const iframe = document.getElementById('googleMap');
@@ -386,8 +544,20 @@ async function performSearch() {
         // Fetch weather
         const weatherData = await fetchWeatherData(location.lat, location.lon, date);
 
+        // Fetch last year's data for comparison
+        const lastYearDate = getLastYearDate(date);
+        let lastYearData = null;
+        try {
+            lastYearData = await fetchWeatherData(location.lat, location.lon, lastYearDate);
+        } catch (err) {
+            console.warn('Could not fetch last year data:', err);
+        }
+
         // Display
         displayResults(location, weatherData, date);
+
+        // Display historical comparison
+        displayHistoricalComparison(weatherData, lastYearData, date, lastYearDate);
 
         // Save to recent
         const windSpeed = weatherData.daily.windspeed_10m_max?.[0] ?? 0;
@@ -420,5 +590,6 @@ document.addEventListener('DOMContentLoaded', () => {
     initVisitCounter();
     setDefaultDate();
     setupKeyboardShortcuts();
+    setupAutocomplete();
     renderRecentSearches();
 });

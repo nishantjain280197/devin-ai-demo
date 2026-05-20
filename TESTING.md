@@ -71,7 +71,26 @@ Follow each test case below in order. Each test builds on the previous one (e.g.
 
 ---
 
-### Test 2: Address Search
+### Test 2: Address Autocomplete
+
+**Objective**: Verify that typing in the Address field shows autocomplete suggestions from Nominatim.
+
+**Steps**:
+1. In the "Address" tab, start typing "1600 Penn" (at least 3 characters)
+2. Wait 350ms+ for suggestions to appear
+3. Verify a dropdown appears below the input with U.S. address suggestions
+4. Click one of the suggestions to select it
+
+**Pass Criteria**:
+- A dropdown appears below the address input after typing 3+ characters
+- Each suggestion shows a map marker icon and a full address string
+- Clicking a suggestion populates the address input field with the selected address
+- Dropdown closes after selection
+- Keyboard navigation works: Arrow Down/Up to highlight, Enter to select, Escape to close
+
+---
+
+### Test 3: Address Search
 
 **Objective**: Verify searching by full address returns correct weather data, renders all result sections, and updates the map.
 
@@ -104,11 +123,12 @@ Follow each test case below in order. Each test builds on the previous one (e.g.
   - Weather description text (e.g., "Overcast", "Clear sky", "Moderate drizzle")
 - **Hourly Wind Speed chart**: 24 bars (one per hour, labeled 0–23) with numeric values displayed above each bar
 - **Map**: Google Maps embed loaded, centered on the searched location with a pin marker
+- **Year-over-Year Comparison**: Section appears showing wind, precipitation, and temperature from the selected date vs. same date last year, with change indicators (arrows up/down or "Similar")
 - **Recent Searches**: A new entry appears with the location name, date, and wind speed
 
 ---
 
-### Test 3: City & State Search
+### Test 4: City & State Search
 
 **Objective**: Verify the City & State tab works correctly with separate input fields.
 
@@ -128,7 +148,7 @@ Follow each test case below in order. Each test builds on the previous one (e.g.
 
 ---
 
-### Test 4: ZIP Code Search
+### Test 5: ZIP Code Search
 
 **Objective**: Verify searching by ZIP code resolves to the correct location.
 
@@ -148,7 +168,7 @@ Follow each test case below in order. Each test builds on the previous one (e.g.
 
 ---
 
-### Test 5: Recent Searches Re-run
+### Test 6: Recent Searches Re-run
 
 **Objective**: Verify that clicking a recent search entry re-runs that search with correct data.
 
@@ -169,7 +189,7 @@ Follow each test case below in order. Each test builds on the previous one (e.g.
 
 ---
 
-### Test 6: Input Validation
+### Test 7: Input Validation
 
 **Objective**: Verify that the app shows appropriate validation errors for invalid input.
 
