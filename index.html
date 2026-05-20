@@ -66,9 +66,10 @@
 
                 <!-- Address Search -->
                 <div class="tab-content active" id="tab-address">
-                    <div class="input-group">
+                    <div class="input-group autocomplete-wrapper">
                         <label for="addressInput"><i class="fas fa-home"></i> Full Address</label>
-                        <input type="text" id="addressInput" placeholder="e.g., 1600 Pennsylvania Ave, Washington, DC" />
+                        <input type="text" id="addressInput" placeholder="e.g., 1600 Pennsylvania Ave, Washington, DC" autocomplete="off" />
+                        <div class="autocomplete-dropdown" id="autocompleteDropdown"></div>
                     </div>
                 </div>
 
@@ -243,6 +244,70 @@
             <div class="hourly-section">
                 <h3><i class="fas fa-chart-line"></i> Hourly Wind Speed Breakdown</h3>
                 <div class="chart-container" id="hourlyChart"></div>
+            </div>
+
+            <!-- Historical Comparison Section -->
+            <div class="historical-section" id="historicalSection" style="display: none;">
+                <h3><i class="fas fa-calendar-check"></i> Year-over-Year Comparison <span class="historical-date-label" id="historicalDateLabel"></span></h3>
+                <div class="comparison-grid">
+                    <div class="comparison-card">
+                        <div class="comparison-header">
+                            <i class="fas fa-wind"></i> Wind Speed (Max)
+                        </div>
+                        <div class="comparison-row">
+                            <div class="comparison-item current">
+                                <span class="comparison-label">Selected Date</span>
+                                <span class="comparison-value" id="currentWind">--</span>
+                                <span class="comparison-unit">mph</span>
+                            </div>
+                            <div class="comparison-divider"><i class="fas fa-arrows-alt-h"></i></div>
+                            <div class="comparison-item previous">
+                                <span class="comparison-label">Last Year</span>
+                                <span class="comparison-value" id="prevWind">--</span>
+                                <span class="comparison-unit">mph</span>
+                            </div>
+                        </div>
+                        <div class="comparison-change" id="windChange"></div>
+                    </div>
+                    <div class="comparison-card">
+                        <div class="comparison-header">
+                            <i class="fas fa-cloud-rain"></i> Precipitation
+                        </div>
+                        <div class="comparison-row">
+                            <div class="comparison-item current">
+                                <span class="comparison-label">Selected Date</span>
+                                <span class="comparison-value" id="currentPrecip">--</span>
+                                <span class="comparison-unit">in</span>
+                            </div>
+                            <div class="comparison-divider"><i class="fas fa-arrows-alt-h"></i></div>
+                            <div class="comparison-item previous">
+                                <span class="comparison-label">Last Year</span>
+                                <span class="comparison-value" id="prevPrecip">--</span>
+                                <span class="comparison-unit">in</span>
+                            </div>
+                        </div>
+                        <div class="comparison-change" id="precipChange"></div>
+                    </div>
+                    <div class="comparison-card">
+                        <div class="comparison-header">
+                            <i class="fas fa-thermometer-half"></i> Temperature (High)
+                        </div>
+                        <div class="comparison-row">
+                            <div class="comparison-item current">
+                                <span class="comparison-label">Selected Date</span>
+                                <span class="comparison-value" id="currentTemp">--</span>
+                                <span class="comparison-unit">&deg;F</span>
+                            </div>
+                            <div class="comparison-divider"><i class="fas fa-arrows-alt-h"></i></div>
+                            <div class="comparison-item previous">
+                                <span class="comparison-label">Last Year</span>
+                                <span class="comparison-value" id="prevTemp">--</span>
+                                <span class="comparison-unit">&deg;F</span>
+                            </div>
+                        </div>
+                        <div class="comparison-change" id="tempChange"></div>
+                    </div>
+                </div>
             </div>
 
             <!-- Map Section -->

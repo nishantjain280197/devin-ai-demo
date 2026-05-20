@@ -5,10 +5,12 @@ An interactive web application for checking **wind and hail weather conditions**
 ## Features
 
 - **Multi-Mode Location Search** — Search by full address, city & state, or ZIP code
+- **Address Autocomplete** — Real-time address suggestions as you type (powered by Nominatim)
 - **Wind Condition Reports** — Maximum wind speed, gusts, direction with risk assessment (Low / Moderate / High / Severe)
 - **Hail & Precipitation Analysis** — Total precipitation, snowfall, showers with hail risk detection based on weather codes
 - **Interactive Google Map** — Pins the searched location on an embedded Google Map centered on the searched coordinates
 - **Hourly Wind Speed Chart** — Visual bar chart showing wind speed for each hour of the selected date, color-coded by risk level
+- **Year-over-Year Comparison** — Automatically fetches the same date from last year and shows side-by-side comparison of wind, precipitation, and temperature
 - **Additional Weather Details** — High/low temperature, humidity, weather description
 - **Page Visit Counter** — Tracks how many times a user has visited the page (persisted via localStorage)
 - **Recent Searches** — Saves the last 10 searches with one-click re-run capability
