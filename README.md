@@ -7,7 +7,7 @@ An interactive web application for checking **wind and hail weather conditions**
 - **Multi-Mode Location Search** — Search by full address, city & state, or ZIP code
 - **Wind Condition Reports** — Maximum wind speed, gusts, direction with risk assessment (Low / Moderate / High / Severe)
 - **Hail & Precipitation Analysis** — Total precipitation, snowfall, showers with hail risk detection based on weather codes
-- **Interactive Map** — Pins the searched location on an OpenStreetMap-powered map with a popup showing wind and precipitation summary
+- **Interactive Google Map** — Pins the searched location on an embedded Google Map centered on the searched coordinates
 - **Hourly Wind Speed Chart** — Visual bar chart showing wind speed for each hour of the selected date, color-coded by risk level
 - **Additional Weather Details** — High/low temperature, humidity, weather description
 - **Page Visit Counter** — Tracks how many times a user has visited the page (persisted via localStorage)
@@ -73,7 +73,7 @@ All APIs are **free** and require **no API keys**:
 |-----|---------|--------------|
 | [Open-Meteo](https://open-meteo.com/) | Weather data (historical + forecast) | [Docs](https://open-meteo.com/en/docs) |
 | [Nominatim (OpenStreetMap)](https://nominatim.openstreetmap.org/) | Geocoding (address/city/ZIP to coordinates) | [Docs](https://nominatim.org/release-docs/latest/) |
-| [Leaflet.js](https://leafletjs.com/) + OpenStreetMap tiles | Interactive mapping | [Docs](https://leafletjs.com/reference.html) |
+| [Google Maps Embed](https://developers.google.com/maps/documentation/embed/get-started) | Interactive mapping (no API key required) | [Docs](https://developers.google.com/maps/documentation/embed/get-started) |
 
 ### API Details
 
@@ -108,7 +108,7 @@ All APIs are **free** and require **no API keys**:
 - **HTML5** — Semantic markup
 - **CSS3** — Custom properties, CSS Grid, animations, responsive design
 - **Vanilla JavaScript** — No frameworks, ES6+ syntax
-- **Leaflet.js v1.9.4** — Interactive mapping library
+- **Google Maps Embed** — Interactive mapping (no API key required)
 - **Font Awesome 6.5.1** — Icons
 - **Inter** — Google Font for typography
 

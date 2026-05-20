@@ -702,11 +702,11 @@ body {
     margin-right: 8px;
 }
 
-#map {
-    height: 400px;
+#mapContainer {
+    height: 450px;
     border-radius: var(--radius);
     border: 2px solid var(--border);
-    z-index: 1;
+    overflow: hidden;
 }
 
 /* === Recent Searches === */
@@ -873,8 +873,8 @@ body {
         padding: 16px;
     }
 
-    #map {
-        height: 280px;
+    #mapContainer {
+        height: 300px;
     }
 }
 

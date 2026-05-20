@@ -1,7 +1,5 @@
 // === Insurance Weather Services - Main Application ===
 
-let map = null;
-let marker = null;
 let activeTab = 'address';
 
 // === Visit Counter ===
@@ -308,27 +306,9 @@ function renderHourlyChart(hourly) {
 
 // === Map ===
 function updateMap(lat, lon, name, windSpeed, precip) {
-    if (map) {
-        map.remove();
-    }
-
-    map = L.map('map').setView([lat, lon], 13);
-    L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
-        attribution: '&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors',
-        maxZoom: 19
-    }).addTo(map);
-
-    const popupContent = `
-        <div style="font-family: Inter, sans-serif; padding: 4px;">
-            <strong style="font-size: 0.9rem;">${name.split(',').slice(0, 2).join(',')}</strong><br>
-            <span style="font-size: 0.8rem; color: #5f6368;">
-                <i class="fas fa-wind" style="color: #1565c0;"></i> Wind: ${windSpeed.toFixed(1)} mph<br>
-                <i class="fas fa-cloud-rain" style="color: #7b1fa2;"></i> Precip: ${precip.toFixed(2)} in
-            </span>
-        </div>
-    `;
-
-    marker = L.marker([lat, lon]).addTo(map).bindPopup(popupContent).openPopup();
+    const iframe = document.getElementById('googleMap');
+    const query = encodeURIComponent(name.split(',').slice(0, 3).join(','));
+    iframe.src = `https://www.google.com/maps?q=${lat},${lon}&z=13&output=embed`;
 }
 
 // === Recent Searches ===

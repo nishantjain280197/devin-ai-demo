@@ -103,7 +103,7 @@ Follow each test case below in order. Each test builds on the previous one (e.g.
   - Humidity percentage
   - Weather description text (e.g., "Overcast", "Clear sky", "Moderate drizzle")
 - **Hourly Wind Speed chart**: 24 bars (one per hour, labeled 0–23) with numeric values displayed above each bar
-- **Map**: OpenStreetMap tiles loaded, centered on the searched location, with a marker pin and popup showing wind speed and precipitation
+- **Map**: Google Maps embed loaded, centered on the searched location with a pin marker
 - **Recent Searches**: A new entry appears with the location name, date, and wind speed
 
 ---
