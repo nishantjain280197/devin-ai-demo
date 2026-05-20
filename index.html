@@ -1,0 +1,276 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Insurance Weather Services</title>
+    <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" />
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css" />
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="css/styles.css" />
+</head>
+<body>
+    <!-- Visit Counter Badge -->
+    <div class="visit-counter" id="visitCounter">
+        <i class="fas fa-eye"></i>
+        <span>Visits: <strong id="visitCount">0</strong></span>
+    </div>
+
+    <!-- Header -->
+    <header class="header">
+        <div class="header-content">
+            <div class="logo-section">
+                <div class="logo-icon">
+                    <i class="fas fa-cloud-sun-rain"></i>
+                </div>
+                <div class="logo-text">
+                    <h1>Insurance Weather Services</h1>
+                    <p class="tagline">Wind & Hail Risk Assessment for Any U.S. Location</p>
+                </div>
+            </div>
+            <div class="header-stats">
+                <div class="stat-badge">
+                    <i class="fas fa-map-marker-alt"></i>
+                    <span>U.S. Coverage</span>
+                </div>
+                <div class="stat-badge">
+                    <i class="fas fa-database"></i>
+                    <span>Historical Data</span>
+                </div>
+                <div class="stat-badge">
+                    <i class="fas fa-shield-alt"></i>
+                    <span>Risk Analysis</span>
+                </div>
+            </div>
+        </div>
+    </header>
+
+    <!-- Main Content -->
+    <main class="main-content">
+        <!-- Search Section -->
+        <section class="search-section">
+            <div class="search-card">
+                <h2><i class="fas fa-search-location"></i> Search Location</h2>
+                <p class="search-description">Enter an address, city, state, or ZIP code to check wind and hail conditions</p>
+
+                <div class="search-tabs">
+                    <button class="tab-btn active" data-tab="address" onclick="switchTab('address')">
+                        <i class="fas fa-map-marker-alt"></i> Address
+                    </button>
+                    <button class="tab-btn" data-tab="city" onclick="switchTab('city')">
+                        <i class="fas fa-city"></i> City & State
+                    </button>
+                    <button class="tab-btn" data-tab="zipcode" onclick="switchTab('zipcode')">
+                        <i class="fas fa-hashtag"></i> ZIP Code
+                    </button>
+                </div>
+
+                <!-- Address Search -->
+                <div class="tab-content active" id="tab-address">
+                    <div class="input-group">
+                        <label for="addressInput"><i class="fas fa-home"></i> Full Address</label>
+                        <input type="text" id="addressInput" placeholder="e.g., 1600 Pennsylvania Ave, Washington, DC" />
+                    </div>
+                </div>
+
+                <!-- City & State Search -->
+                <div class="tab-content" id="tab-city">
+                    <div class="input-row">
+                        <div class="input-group">
+                            <label for="cityInput"><i class="fas fa-city"></i> City</label>
+                            <input type="text" id="cityInput" placeholder="e.g., Dallas" />
+                        </div>
+                        <div class="input-group">
+                            <label for="stateInput"><i class="fas fa-flag-usa"></i> State</label>
+                            <input type="text" id="stateInput" placeholder="e.g., Texas" />
+                        </div>
+                    </div>
+                </div>
+
+                <!-- ZIP Code Search -->
+                <div class="tab-content" id="tab-zipcode">
+                    <div class="input-group">
+                        <label for="zipcodeInput"><i class="fas fa-hashtag"></i> ZIP Code</label>
+                        <input type="text" id="zipcodeInput" placeholder="e.g., 73301" maxlength="10" />
+                    </div>
+                </div>
+
+                <!-- Date & Time -->
+                <div class="datetime-section">
+                    <div class="input-row">
+                        <div class="input-group">
+                            <label for="dateInput"><i class="fas fa-calendar-alt"></i> Date</label>
+                            <input type="date" id="dateInput" />
+                        </div>
+                        <div class="input-group">
+                            <label for="timeInput"><i class="fas fa-clock"></i> Time (optional)</label>
+                            <input type="time" id="timeInput" />
+                        </div>
+                    </div>
+                </div>
+
+                <button class="search-btn" id="searchBtn" onclick="performSearch()">
+                    <i class="fas fa-search"></i> Check Weather Conditions
+                </button>
+            </div>
+        </section>
+
+        <!-- Loading Spinner -->
+        <div class="loading-overlay" id="loadingOverlay">
+            <div class="spinner-container">
+                <div class="spinner"></div>
+                <p>Fetching weather data...</p>
+            </div>
+        </div>
+
+        <!-- Results Section -->
+        <section class="results-section" id="resultsSection" style="display: none;">
+            <!-- Location Info -->
+            <div class="location-info" id="locationInfo">
+                <div class="location-header">
+                    <h3><i class="fas fa-map-pin"></i> <span id="locationName">--</span></h3>
+                    <span class="coordinates" id="coordinates">--</span>
+                </div>
+                <span class="search-date" id="searchDate">--</span>
+            </div>
+
+            <!-- Weather Cards -->
+            <div class="weather-cards">
+                <!-- Wind Card -->
+                <div class="weather-card wind-card">
+                    <div class="card-header">
+                        <div class="card-icon wind-icon">
+                            <i class="fas fa-wind"></i>
+                        </div>
+                        <h3>Wind Conditions</h3>
+                    </div>
+                    <div class="card-body">
+                        <div class="main-metric">
+                            <span class="metric-value" id="windSpeed">--</span>
+                            <span class="metric-unit">mph</span>
+                        </div>
+                        <div class="metric-label">Maximum Wind Speed</div>
+                        <div class="sub-metrics">
+                            <div class="sub-metric">
+                                <span class="sub-label">Gusts</span>
+                                <span class="sub-value" id="windGusts">--</span>
+                                <span class="sub-unit">mph</span>
+                            </div>
+                            <div class="sub-metric">
+                                <span class="sub-label">Direction</span>
+                                <span class="sub-value" id="windDirection">--</span>
+                                <span class="sub-unit">&deg;</span>
+                            </div>
+                        </div>
+                        <div class="risk-indicator" id="windRisk">
+                            <div class="risk-bar">
+                                <div class="risk-fill" id="windRiskFill"></div>
+                            </div>
+                            <span class="risk-label" id="windRiskLabel">--</span>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Hail Card -->
+                <div class="weather-card hail-card">
+                    <div class="card-header">
+                        <div class="card-icon hail-icon">
+                            <i class="fas fa-cloud-meatball"></i>
+                        </div>
+                        <h3>Hail Conditions</h3>
+                    </div>
+                    <div class="card-body">
+                        <div class="main-metric">
+                            <span class="metric-value" id="hailPrecip">--</span>
+                            <span class="metric-unit">in</span>
+                        </div>
+                        <div class="metric-label">Total Precipitation</div>
+                        <div class="sub-metrics">
+                            <div class="sub-metric">
+                                <span class="sub-label">Snowfall</span>
+                                <span class="sub-value" id="snowfall">--</span>
+                                <span class="sub-unit">in</span>
+                            </div>
+                            <div class="sub-metric">
+                                <span class="sub-label">Showers</span>
+                                <span class="sub-value" id="showers">--</span>
+                                <span class="sub-unit">in</span>
+                            </div>
+                        </div>
+                        <div class="risk-indicator" id="hailRisk">
+                            <div class="risk-bar">
+                                <div class="risk-fill" id="hailRiskFill"></div>
+                            </div>
+                            <span class="risk-label" id="hailRiskLabel">--</span>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Additional Info Card -->
+                <div class="weather-card info-card">
+                    <div class="card-header">
+                        <div class="card-icon info-icon">
+                            <i class="fas fa-thermometer-half"></i>
+                        </div>
+                        <h3>Additional Details</h3>
+                    </div>
+                    <div class="card-body">
+                        <div class="main-metric">
+                            <span class="metric-value" id="tempMax">--</span>
+                            <span class="metric-unit">&deg;F</span>
+                        </div>
+                        <div class="metric-label">High Temperature</div>
+                        <div class="sub-metrics">
+                            <div class="sub-metric">
+                                <span class="sub-label">Low</span>
+                                <span class="sub-value" id="tempMin">--</span>
+                                <span class="sub-unit">&deg;F</span>
+                            </div>
+                            <div class="sub-metric">
+                                <span class="sub-label">Humidity</span>
+                                <span class="sub-value" id="humidity">--</span>
+                                <span class="sub-unit">%</span>
+                            </div>
+                        </div>
+                        <div class="weather-code-display">
+                            <i class="fas fa-info-circle"></i>
+                            <span id="weatherDescription">--</span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Hourly Chart -->
+            <div class="hourly-section">
+                <h3><i class="fas fa-chart-line"></i> Hourly Wind Speed Breakdown</h3>
+                <div class="chart-container" id="hourlyChart"></div>
+            </div>
+
+            <!-- Map Section -->
+            <div class="map-section">
+                <h3><i class="fas fa-map-marked-alt"></i> Location Map</h3>
+                <div id="map"></div>
+            </div>
+        </section>
+
+        <!-- Recent Searches -->
+        <section class="recent-section" id="recentSection">
+            <h3><i class="fas fa-history"></i> Recent Searches</h3>
+            <div class="recent-list" id="recentList">
+                <p class="no-searches">No recent searches yet. Try searching for a location above!</p>
+            </div>
+        </section>
+    </main>
+
+    <!-- Footer -->
+    <footer class="footer">
+        <div class="footer-content">
+            <p>&copy; 2025 Insurance Weather Services. Weather data provided by <a href="https://open-meteo.com/" target="_blank">Open-Meteo</a>.</p>
+            <p>Geocoding by <a href="https://nominatim.openstreetmap.org/" target="_blank">OpenStreetMap Nominatim</a>. Maps by <a href="https://leafletjs.com/" target="_blank">Leaflet</a>.</p>
+        </div>
+    </footer>
+
+    <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
+    <script src="js/app.js"></script>
+</body>
+</html>
